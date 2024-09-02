@@ -13,8 +13,11 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Redirect root to login page
-Route::redirect('/', '/login');
+// Root route - show marketing view for guests, redirect to home for authenticated users
+Route::get('/', function () {
+    return Auth::check() ? redirect('/home') : view('index');
+})->name('root');
+
 
 // Authentication Routes
 Auth::routes();
