@@ -9,7 +9,7 @@
 
                     <div class="card-body">
                         <p>Your current support time balance: <strong>{{ trans_choice(':count hour|:count hours', $user->support_time_balance, ['count' => $user->support_time_balance]) }}</strong></p>
-                        <a href="{{ route('support.purchase') }}" class="btn btn-primary">Purchase Support Time</a>
+                        <a href="{{ route('support.purchase') }}" class="btn btn-vanguard">Purchase Support Time</a>
                     </div>
                 </div>
 

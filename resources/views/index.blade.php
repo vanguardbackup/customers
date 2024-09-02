@@ -28,8 +28,8 @@
 <body>
 <div class="container">
     <header class="text-center my-5">
-        <h1 class="display-4">Vanguard Support</h1>
-        <p class="lead">Expert assistance from the creators of Vanguard</p>
+        <h1 class="display-4">Vanguard Paid Support</h1>
+        <p class="lead">Expert assistance from the creators of Vanguard.</p>
     </header>
 
     <main>
@@ -37,7 +37,7 @@
             <div class="col-lg-6 mb-4">
                 <div class="card h-100 shadow-sm">
                     <div class="card-body">
-                        <h2 class="card-title">Get Premium Support</h2>
+                        <h2 class="card-title">Get Support</h2>
                         <p class="card-text">Need help with Vanguard? Get direct support from the creators themselves.</p>
                         <ul class="list-group list-group-flush mb-3">
                             <li class="list-group-item">One-on-one assistance</li>
@@ -46,8 +46,8 @@
                         </ul>
                         <p class="h4">Price: £30 per hour</p>
                         <div class="mt-4">
-                            <a href="{{ route('login') }}" class="btn btn-primary me-2">Login</a>
-                            <a href="{{ route('register') }}" class="btn btn-success">Register</a>
+                            <a href="{{ route('login') }}" class="btn btn-vanguard me-2">Login</a>
+                            <a href="{{ route('register') }}" class="btn btn-secondary">Register</a>
                         </div>
                     </div>
                 </div>
