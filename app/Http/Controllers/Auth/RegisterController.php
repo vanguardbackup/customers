@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+
+class RegisterController extends Controller
+{
+    use RegistersUsers;
+
+    protected string $redirectTo = '/home';
+
+    public function __construct()
+    {
+        $this->middleware('guest');
+    }
+
+    protected function validator(array $data)
+    {
+        return Validator::make($data, [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'billing_address' => ['required', 'string', 'max:255'],
+            'billing_city' => ['required', 'string', 'max:255'],
+            'billing_state' => ['required', 'string', 'max:255'],
+            'billing_country' => ['required', 'string', 'max:255'],
+            'billing_zip_code' => ['required', 'string', 'max:20'],
+        ]);
+    }
+
+    protected function create(array $data)
+    {
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'billing_address' => $data['billing_address'],
+            'billing_city' => $data['billing_city'],
+            'billing_state' => $data['billing_state'],
+            'billing_country' => $data['billing_country'],
+            'billing_zip_code' => $data['billing_zip_code'],
+        ]);
+
+        return $user;
+    }
+}
