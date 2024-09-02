@@ -4,8 +4,57 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e5fa111dc30d88c00ffaadf576c840d0",
+    "content-hash": "5985b4ab34ba908a0f48cff07a77c47c",
     "packages": [
+        {
+            "name": "aminkhoshzahmat/country-code",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aminkhoshzahmat/country-code.git",
+                "reference": "083dfb5c0bd78b330eee242c8415b4f0092e1fdf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aminkhoshzahmat/country-code/zipball/083dfb5c0bd78b330eee242c8415b4f0092e1fdf",
+                "reference": "083dfb5c0bd78b330eee242c8415b4f0092e1fdf",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.14"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Aminkhoshzahmat\\CountryCode\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Amin Khoshzahmat",
+                    "email": "aminkhoshzahmat@gmail.com",
+                    "role": "Owner"
+                },
+                {
+                    "name": "Morteza Karimi",
+                    "email": "me@morteza-karimi.ir",
+                    "role": "Contributor"
+                }
+            ],
+            "description": "A list of all countries with phone, code, and their names",
+            "support": {
+                "issues": "https://github.com/aminkhoshzahmat/country-code/issues",
+                "source": "https://github.com/aminkhoshzahmat/country-code/tree/v1.1.0"
+            },
+            "time": "2023-02-26T12:59:21+00:00"
+        },
         {
             "name": "brick/math",
             "version": "0.12.1",

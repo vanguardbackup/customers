@@ -10,15 +10,20 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class InformDevsMail extends Mailable
+class InformCustomerMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(public readonly User $user)
-    {
+    public function __construct(
+        public readonly User $user,
+        public readonly int $purchasedTime,
+        public readonly string $supportType,
+        public readonly ?string $details,
+        public readonly string $paymentId
+    ) {
         //
     }
 
@@ -28,7 +33,7 @@ class InformDevsMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Support time purchased'
+            subject: 'Support Time Purchase Confirmation'
         );
     }
 
@@ -38,10 +43,15 @@ class InformDevsMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.inform-devs-mail',
+            markdown: 'mail.inform-customer-mail',
             with: [
                 'user' => $this->user,
-            ]
+                'purchasedTime' => $this->purchasedTime,
+                'supportType' => $this->supportType,
+                'details' => $this->details,
+                'paymentId' => $this->paymentId,
+                'totalSupportTime' => $this->user->support_time_balance,
+            ],
         );
     }
 }

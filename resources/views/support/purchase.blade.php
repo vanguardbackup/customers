@@ -26,8 +26,37 @@
                                     <input id="quantity" type="number" class="form-control @error('quantity') is-invalid @enderror" name="quantity" value="{{ old('quantity', 1) }}" required autofocus min="1">
                                     @error('quantity')
                                     <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="form-group row mb-3">
+                                <label for="support_type" class="col-md-4 col-form-label text-md-right">Type of Support</label>
+                                <div class="col-md-6">
+                                    <select id="support_type" name="support_type" class="form-select @error('support_type') is-invalid @enderror" required>
+                                        <option value="">Select support type</option>
+                                        <option value="technical" {{ old('support_type') == 'technical' ? 'selected' : '' }}>Technical Issues</option>
+                                        <option value="install" {{ old('support_type') == 'install' ? 'selected' : '' }}>Install Vanguard</option>
+                                        <option value="other" {{ old('support_type') == 'other' ? 'selected' : '' }}>Other</option>
+                                    </select>
+                                    @error('support_type')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="form-group row mb-3">
+                                <label for="details" class="col-md-4 col-form-label text-md-right">Additional Details (Optional)</label>
+                                <div class="col-md-6">
+                                    <textarea id="details" name="details" class="form-control @error('details') is-invalid @enderror" rows="3">{{ old('details') }}</textarea>
+                                    @error('details')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
                                     @enderror
                                 </div>
                             </div>
@@ -61,7 +90,7 @@
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const quantityInput = document.getElementById('quantity');
@@ -77,4 +106,4 @@
             quantityInput.addEventListener('input', updateTotalPrice);
         });
     </script>
-@endsection
+@endpush

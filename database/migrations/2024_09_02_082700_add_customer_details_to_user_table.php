@@ -36,7 +36,7 @@ return new class extends Migration
                 'billing_zip_code',
                 'credit_card_expiration',
                 'purchased_support_time',
-                'last_support_time_purchase'
+                'last_support_time_purchase',
             ]);
         });
     }

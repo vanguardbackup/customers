@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Aminkhoshzahmat\CountryCode\Enums\CountryType;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\View\View;
 
 class RegisterController extends Controller
 {
@@ -28,7 +30,7 @@ class RegisterController extends Controller
             'billing_address' => ['required', 'string', 'max:255'],
             'billing_city' => ['required', 'string', 'max:255'],
             'billing_state' => ['required', 'string', 'max:255'],
-            'billing_country' => ['required', 'string', 'max:255'],
+            'billing_country' => ['required', 'string', 'max:2'],
             'billing_zip_code' => ['required', 'string', 'max:20'],
         ]);
     }
@@ -47,5 +49,21 @@ class RegisterController extends Controller
         ]);
 
         return $user;
+    }
+
+    public function showRegistrationForm(): View
+    {
+        return view('auth.register', ['countries' => $this->getCountryList()]);
+    }
+
+    private function getCountryList(): array
+    {
+        $countries = [];
+        foreach (CountryType::cases() as $country) {
+            $countries[$country->getCode()] = $country->getName();
+        }
+        asort($countries); // Sort countries alphabetically by name
+
+        return $countries;
     }
 }
