@@ -58,13 +58,13 @@ class SupportTimePurchaseController extends Controller
             Log::error('Mollie API error during payment initiation', ['error' => $e->getMessage()]);
 
             return redirect()->route('home')
-                ->with('error', 'An error occurred while initiating your payment. Please try again or contact support.');
+                ->with('error', 'An error occurred while initiating your payment. Please try again or contact support@vanguardbackup.com.');
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error during support time purchase', ['error' => $e->getMessage()]);
 
             return redirect()->route('home')
-                ->with('error', 'An unexpected error occurred. Please try again or contact support.');
+                ->with('error', 'An unexpected error occurred. Please try again or contact support@vanguardbackup.com.');
         }
     }
 
