@@ -120,6 +120,41 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingFour">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                        How will we communicate during support sessions?
+                                    </button>
+                                </h2>
+                                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        We offer multiple communication options for support sessions, including:
+                                        <ul>
+                                            <li>Video calls via Zoom, Google Meet or Microsoft Teams</li>
+                                            <li>Screen sharing for more complex issues</li>
+                                            <li>Email for non-urgent queries or follow-ups</li>
+                                        </ul>
+                                        The most appropriate method will be agreed upon when scheduling your support session.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingFive">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                        What if I need urgent support?
+                                    </button>
+                                </h2>
+                                <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        While we strive to provide timely support, please note that as an open-source project, we don't offer 24/7 or emergency support. For urgent issues, we recommend checking our documentation first. If you still need assistance, you can request an expedited session, subject to supporter availability and potentially at a higher rate.
+                                    </div>
+                                </div>
+                            </div>
+
+
+
                         </div>
                     </div>
                 </div>

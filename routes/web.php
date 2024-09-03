@@ -44,3 +44,5 @@ Route::middleware(['auth'])->group(function () {
 Route::prefix('webhooks')->name('webhooks.')->group(function () {
     Route::post('/mollie', [MollieWebhookController::class, 'handleWebhookNotification'])->name('mollie');
 });
+
+Route::view('/terms', 'terms')->name('terms');

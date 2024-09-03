@@ -10,11 +10,6 @@ class SupportTimePurchase extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'user_id',
         'quantity',
@@ -25,11 +20,6 @@ class SupportTimePurchase extends Model
         'expired_at',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'quantity' => 'integer',
         'amount' => 'decimal:2',
@@ -44,9 +34,20 @@ class SupportTimePurchase extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Check if the purchase is expired.
+     */
     public function isExpired(): bool
     {
-        return $this->expired_at !== null && $this->expired_at->isPast();
+        return $this->expired_at !== null;
+    }
+
+    /**
+     * Check if the purchase is active.
+     */
+    public function isActive(): bool
+    {
+        return !$this->isExpired();
     }
 
     /**
@@ -54,7 +55,7 @@ class SupportTimePurchase extends Model
      */
     public function getFormattedAmountAttribute(): string
     {
-        return '£'.number_format($this->amount, 2);
+        return '£' . number_format($this->amount, 2);
     }
 
     /**
@@ -63,6 +64,22 @@ class SupportTimePurchase extends Model
     public function getFormattedSupportTypeAttribute(): string
     {
         return ucfirst($this->support_type);
+    }
+
+    /**
+     * Scope a query to only include active purchases.
+     */
+    public function scopeActive($query)
+    {
+        return $query->whereNull('expired_at');
+    }
+
+    /**
+     * Scope a query to only include expired purchases.
+     */
+    public function scopeExpired($query)
+    {
+        return $query->whereNotNull('expired_at');
     }
 
     /**

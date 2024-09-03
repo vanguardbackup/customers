@@ -10,11 +10,14 @@
                     <div class="card-body">
                         <div class="alert alert-info mb-4">
                             <h5 class="alert-heading">Important Information</h5>
-                            <p class="mb-0">You are about to purchase support time. Please note:</p>
+                            <p class="mb-0">Before purchasing support time, please note:</p>
                             <ul class="mb-0">
                                 <li>Support time is billed in whole hours.</li>
                                 <li>The minimum purchase is 1 hour.</li>
                                 <li><strong>This purchase is non-refundable.</strong> Please ensure you need the support time before proceeding.</li>
+                                <li>Support time expires 12 months from the date of purchase.</li>
+                                <li>Our support team is available Monday to Friday, 9 AM to 5 PM GMT.</li>
+                                <li>Emergency support outside these hours may be subject to additional charges.</li>
                             </ul>
                         </div>
 
@@ -75,9 +78,25 @@
                                 </div>
                             </div>
 
+                            <div class="form-group row mb-3">
+                                <div class="col-md-6 offset-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input @error('terms') is-invalid @enderror" type="checkbox" name="terms" id="terms" required {{ old('terms') ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="terms">
+                                            I confirm that I have read and agree to the <a href="{{ route('terms') }}" target="_blank">Terms of Service</a> and understand that this purchase is non-refundable.
+                                        </label>
+                                        @error('terms')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="form-group row mb-0">
                                 <div class="col-md-6 offset-md-4">
-                                    <button type="submit" class="btn btn-vanguard">
+                                    <button type="submit" class="btn btn-vanguard" id="purchaseButton" disabled>
                                         Purchase Support Time
                                     </button>
                                 </div>
@@ -95,6 +114,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             const quantityInput = document.getElementById('quantity');
             const totalPriceElement = document.getElementById('totalPrice');
+            const termsCheckbox = document.getElementById('terms');
+            const purchaseButton = document.getElementById('purchaseButton');
             const unitPrice = {{ $unitPrice }};
 
             function updateTotalPrice() {
@@ -103,7 +124,15 @@
                 totalPriceElement.textContent = '£' + totalPrice.toFixed(2);
             }
 
+            function updatePurchaseButtonState() {
+                purchaseButton.disabled = !termsCheckbox.checked;
+            }
+
             quantityInput.addEventListener('input', updateTotalPrice);
+            termsCheckbox.addEventListener('change', updatePurchaseButtonState);
+
+            updateTotalPrice();
+            updatePurchaseButtonState();
         });
     </script>
 @endpush

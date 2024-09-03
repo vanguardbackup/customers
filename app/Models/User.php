@@ -14,28 +14,13 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that aren't mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $guarded = [];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
@@ -44,7 +29,6 @@ class User extends Authenticatable
         'billing_state' => 'encrypted',
         'billing_country' => 'encrypted',
         'billing_zip_code' => 'encrypted',
-        'support_time_balance' => 'integer',
     ];
 
     /**
@@ -53,12 +37,24 @@ class User extends Authenticatable
     public function getGravatarAttribute(): string
     {
         $hash = md5(strtolower(trim($this->email)));
-
         return "https://www.gravatar.com/avatar/{$hash}";
     }
 
+    /**
+     * Get the user's support time purchases.
+     */
     public function supportTimePurchases(): HasMany
     {
         return $this->hasMany(SupportTimePurchase::class);
+    }
+
+    /**
+     * Get the user's current support time balance.
+     */
+    public function getSupportTimeBalanceAttribute(): int
+    {
+        return $this->supportTimePurchases()
+            ->whereNull('expired_at')
+            ->sum('quantity');
     }
 }

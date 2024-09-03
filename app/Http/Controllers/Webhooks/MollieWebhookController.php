@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Mail\InformCustomerMail;
 use App\Mail\InformTeamMail;
 use App\Models\User;
+use App\Models\SupportTimePurchase;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Mollie\Api\Exceptions\ApiException;
@@ -51,15 +53,54 @@ class MollieWebhookController extends Controller
         $metadata = $payment->metadata;
         $user = User::findOrFail($metadata->user_id);
 
-        $user->support_time_balance += $metadata->quantity;
-        $user->save();
+        DB::transaction(function () use ($user, $metadata, $payment) {
+            $existingPurchase = SupportTimePurchase::where('payment_id', $payment->id)->first();
 
-        Log::info('Support time purchase successful', [
-            'user_id' => $user->id,
-            'quantity' => $metadata->quantity,
-        ]);
+            if ($existingPurchase) {
+                Log::info('Duplicate payment webhook received', [
+                    'payment_id' => $payment->id,
+                    'user_id' => $user->id,
+                ]);
+                return;
+            }
 
-        $this->sendNotificationEmails($user, $metadata, $payment->id);
+            $latestPurchase = $user->supportTimePurchases()
+                ->whereNull('expired_at')
+                ->where('support_type', $metadata->support_type)
+                ->where('created_at', '>', now()->subMinutes(5))
+                ->orderByDesc('created_at')
+                ->first();
+
+            if ($latestPurchase) {
+                $latestPurchase->quantity += $metadata->quantity;
+                $latestPurchase->amount += $payment->amount->value;
+                $latestPurchase->save();
+
+                Log::info('Support time purchase consolidated', [
+                    'user_id' => $user->id,
+                    'quantity' => $metadata->quantity,
+                    'purchase_id' => $latestPurchase->id,
+                ]);
+            } else {
+                $newPurchase = new SupportTimePurchase([
+                    'user_id' => $user->id,
+                    'quantity' => $metadata->quantity,
+                    'support_type' => $metadata->support_type,
+                    'details' => $metadata->details,
+                    'payment_id' => $payment->id,
+                    'amount' => $payment->amount->value,
+                ]);
+                $newPurchase->save();
+
+                Log::info('New support time purchase created', [
+                    'user_id' => $user->id,
+                    'quantity' => $metadata->quantity,
+                    'purchase_id' => $newPurchase->id,
+                ]);
+            }
+
+            $this->sendNotificationEmails($user, $metadata, $payment->id);
+        });
     }
 
     /**

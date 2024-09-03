@@ -39,6 +39,7 @@ class SupportTimePurchaseController extends Controller
             'quantity' => ['required', 'integer', 'min:1'],
             'support_type' => ['required', 'string', 'in:technical,install,other'],
             'details' => ['nullable', 'string', 'max:500'],
+            'terms' => ['required', 'accepted'],
         ]);
 
         $user = auth()->user();
