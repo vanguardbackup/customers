@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Webhooks;
 use App\Http\Controllers\Controller;
 use App\Mail\InformCustomerMail;
 use App\Mail\InformTeamMail;
-use App\Models\User;
 use App\Models\SupportTimePurchase;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -61,6 +61,7 @@ class MollieWebhookController extends Controller
                     'payment_id' => $payment->id,
                     'user_id' => $user->id,
                 ]);
+
                 return;
             }
 

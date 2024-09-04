@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Support\DeductTimeController;
 use App\Http\Controllers\Support\SupportTimePurchaseController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\Webhooks\MollieWebhookController;
+use App\Http\Middleware\CheckIfAdmin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -17,7 +19,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return Auth::check() ? redirect('/home') : view('index');
 })->name('root');
-
 
 // Authentication Routes
 Auth::routes();
@@ -37,6 +38,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/purchase', [SupportTimePurchaseController::class, 'showPurchaseForm'])->name('purchase');
         Route::post('/purchase', [SupportTimePurchaseController::class, 'initiatePurchase'])->name('purchase.initiate');
         Route::get('/payment/callback', [SupportTimePurchaseController::class, 'handlePaymentCallback'])->name('payment.callback');
+
+        Route::middleware(CheckIfAdmin::class)->group(function () {
+            Route::get('/list', [DeductTimeController::class, 'index'])->name('deduct.list');
+            Route::post('/list', [DeductTimeController::class, 'deductTime'])->name('deduct-time.post');
+        });
     });
 });
 

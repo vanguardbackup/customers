@@ -37,6 +37,7 @@ class User extends Authenticatable
     public function getGravatarAttribute(): string
     {
         $hash = md5(strtolower(trim($this->email)));
+
         return "https://www.gravatar.com/avatar/{$hash}";
     }
 
@@ -54,7 +55,40 @@ class User extends Authenticatable
     public function getSupportTimeBalanceAttribute(): int
     {
         return $this->supportTimePurchases()
-            ->whereNull('expired_at')
+            ->active()
             ->sum('quantity');
+    }
+
+    /**
+     * Scope to include the support time balance.
+     */
+    public function scopeWithSupportTimeBalance($query)
+    {
+        return $query->withSum('supportTimePurchases as support_time_balance', 'quantity');
+    }
+
+    /**
+     * Deduct time from the user's support time balance.
+     */
+    public function deductSupportTime(int $timeToDeduct): void
+    {
+        $purchases = $this->supportTimePurchases()
+            ->active()
+            ->orderBy('created_at')
+            ->get();
+
+        foreach ($purchases as $purchase) {
+            if ($timeToDeduct <= 0) {
+                break;
+            }
+
+            if ($purchase->quantity <= $timeToDeduct) {
+                $timeToDeduct -= $purchase->quantity;
+                $purchase->expire();
+            } else {
+                $purchase->decrement('quantity', $timeToDeduct);
+                $timeToDeduct = 0;
+            }
+        }
     }
 }

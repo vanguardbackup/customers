@@ -47,7 +47,7 @@ class SupportTimePurchase extends Model
      */
     public function isActive(): bool
     {
-        return !$this->isExpired();
+        return ! $this->isExpired();
     }
 
     /**
@@ -55,7 +55,7 @@ class SupportTimePurchase extends Model
      */
     public function getFormattedAmountAttribute(): string
     {
-        return '£' . number_format($this->amount, 2);
+        return '£'.number_format($this->amount, 2);
     }
 
     /**
@@ -88,5 +88,13 @@ class SupportTimePurchase extends Model
     public function scopeOfType($query, string $type)
     {
         return $query->where('support_type', $type);
+    }
+
+    /**
+     * Expire the purchase.
+     */
+    public function expire(): void
+    {
+        $this->update(['expired_at' => now(), 'quantity' => 0]);
     }
 }
