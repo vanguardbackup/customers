@@ -39,7 +39,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/purchase', [SupportTimePurchaseController::class, 'initiatePurchase'])->name('purchase.initiate');
         Route::get('/payment/callback', [SupportTimePurchaseController::class, 'handlePaymentCallback'])->name('payment.callback');
 
-        Route::middleware(CheckIfAdmin::class)->group(function () {
+        Route::middleware('admin')->group(function () {
             Route::get('/list', [DeductTimeController::class, 'index'])->name('deduct.list');
             Route::post('/list', [DeductTimeController::class, 'deductTime'])->name('deduct-time.post');
         });

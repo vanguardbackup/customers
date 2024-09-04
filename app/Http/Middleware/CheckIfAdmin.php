@@ -13,12 +13,10 @@ class CheckIfAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $adminEmail = config('app.admin_email');
-
-        if ($request->user() && $request->user()->email === $adminEmail) {
+        if ($request->user() && $request->user()->isAdmin()) {
             return $next($request);
         }
 
-        return response('Not Found', 404);
+        abort(Response::HTTP_NOT_FOUND);
     }
 }
