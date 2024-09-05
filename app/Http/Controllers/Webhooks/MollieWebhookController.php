@@ -30,6 +30,8 @@ class MollieWebhookController extends Controller
 
             if ($payment->isPaid()) {
                 $this->processPaidPayment($payment);
+            } elseif ($payment->isCanceled()) {
+                $this->processCancelledPayment($payment);
             } elseif ($this->isPaymentFailed($payment)) {
                 $this->logFailedPayment($payment);
             }
@@ -90,6 +92,7 @@ class MollieWebhookController extends Controller
                     'details' => $metadata->details,
                     'payment_id' => $payment->id,
                     'amount' => $payment->amount->value,
+                    'status' => 'completed',
                 ]);
                 $newPurchase->save();
 
@@ -105,11 +108,40 @@ class MollieWebhookController extends Controller
     }
 
     /**
-     * Check if the payment has failed, been canceled, or expired.
+     * Process a cancelled payment.
+     */
+    private function processCancelledPayment(\Mollie\Api\Resources\Payment $payment): void
+    {
+        $metadata = $payment->metadata;
+        $user = User::findOrFail($metadata->user_id);
+
+        DB::transaction(function () use ($user, $payment) {
+            $existingPurchase = SupportTimePurchase::where('payment_id', $payment->id)->first();
+
+            if ($existingPurchase) {
+                $existingPurchase->status = 'cancelled';
+                $existingPurchase->save();
+
+                Log::info('Support time purchase cancelled', [
+                    'user_id' => $user->id,
+                    'payment_id' => $payment->id,
+                    'purchase_id' => $existingPurchase->id,
+                ]);
+            } else {
+                Log::info('Cancelled payment webhook received for non-existent purchase', [
+                    'payment_id' => $payment->id,
+                    'user_id' => $user->id,
+                ]);
+            }
+        });
+    }
+
+    /**
+     * Check if the payment has failed or expired.
      */
     private function isPaymentFailed(\Mollie\Api\Resources\Payment $payment): bool
     {
-        return $payment->isCanceled() || $payment->isExpired() || $payment->isFailed();
+        return $payment->isExpired() || $payment->isFailed();
     }
 
     /**
@@ -117,7 +149,7 @@ class MollieWebhookController extends Controller
      */
     private function logFailedPayment(\Mollie\Api\Resources\Payment $payment): void
     {
-        Log::info('Payment not completed', [
+        Log::info('Payment failed or expired', [
             'status' => $payment->status,
             'payment_id' => $payment->id,
         ]);
