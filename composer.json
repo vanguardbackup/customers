@@ -11,7 +11,8 @@
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.5",
         "mollie/laravel-mollie": "^3.0",
-        "mollie/mollie-api-php": "^2.71"
+        "mollie/mollie-api-php": "^2.71",
+        "sentry/sentry-laravel": "^4.8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
