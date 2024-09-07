@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Resources\Payment;
 use Mollie\Laravel\Facades\Mollie;
 
 /**
@@ -28,13 +29,12 @@ class MollieWebhookController extends Controller
         try {
             $payment = Mollie::api()->payments->get($request->input('id'));
 
-            if ($payment->isPaid()) {
-                $this->processPaidPayment($payment);
-            } elseif ($payment->isCanceled()) {
-                $this->processCancelledPayment($payment);
-            } elseif ($this->isPaymentFailed($payment)) {
-                $this->logFailedPayment($payment);
-            }
+            match ($payment->status) {
+                'paid' => $this->processPaidPayment($payment),
+                'canceled' => $this->processCancelledPayment($payment),
+                'failed', 'expired' => $this->processFailedPayment($payment),
+                default => $this->logUnhandledStatus($payment),
+            };
 
             return response('OK', 200);
         } catch (ApiException $e) {
@@ -50,7 +50,7 @@ class MollieWebhookController extends Controller
     /**
      * Process a successful payment.
      */
-    private function processPaidPayment(\Mollie\Api\Resources\Payment $payment): void
+    private function processPaidPayment(Payment $payment): void
     {
         $metadata = $payment->metadata;
         $user = User::findOrFail($metadata->user_id);
@@ -59,10 +59,14 @@ class MollieWebhookController extends Controller
             $existingPurchase = SupportTimePurchase::where('payment_id', $payment->id)->first();
 
             if ($existingPurchase) {
-                Log::info('Duplicate payment webhook received', [
-                    'payment_id' => $payment->id,
-                    'user_id' => $user->id,
-                ]);
+                if ($existingPurchase->status !== 'completed') {
+                    $existingPurchase->status = 'completed';
+                    $existingPurchase->save();
+                    Log::info('Existing purchase status updated to completed', [
+                        'payment_id' => $payment->id,
+                        'user_id' => $user->id,
+                    ]);
+                }
 
                 return;
             }
@@ -110,7 +114,7 @@ class MollieWebhookController extends Controller
     /**
      * Process a cancelled payment.
      */
-    private function processCancelledPayment(\Mollie\Api\Resources\Payment $payment): void
+    private function processCancelledPayment(Payment $payment): void
     {
         $metadata = $payment->metadata;
         $user = User::findOrFail($metadata->user_id);
@@ -137,19 +141,29 @@ class MollieWebhookController extends Controller
     }
 
     /**
-     * Check if the payment has failed or expired.
+     * Process a failed or expired payment.
      */
-    private function isPaymentFailed(\Mollie\Api\Resources\Payment $payment): bool
+    private function processFailedPayment(Payment $payment): void
     {
-        return $payment->isExpired() || $payment->isFailed();
+        Log::info('Payment failed or expired', [
+            'status' => $payment->status,
+            'payment_id' => $payment->id,
+        ]);
+
+        // Optionally, update any existing purchase record to 'failed' status
+        $existingPurchase = SupportTimePurchase::where('payment_id', $payment->id)->first();
+        if ($existingPurchase) {
+            $existingPurchase->status = 'failed';
+            $existingPurchase->save();
+        }
     }
 
     /**
-     * Log information about a failed payment.
+     * Log unhandled payment status.
      */
-    private function logFailedPayment(\Mollie\Api\Resources\Payment $payment): void
+    private function logUnhandledStatus(Payment $payment): void
     {
-        Log::info('Payment failed or expired', [
+        Log::info('Unhandled payment status received', [
             'status' => $payment->status,
             'payment_id' => $payment->id,
         ]);

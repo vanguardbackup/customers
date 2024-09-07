@@ -5,7 +5,6 @@ use App\Http\Controllers\Support\SupportTimePurchaseController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\Webhooks\MollieWebhookController;
-use App\Http\Middleware\CheckIfAdmin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
